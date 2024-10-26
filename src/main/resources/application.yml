@@ -1,0 +1,73 @@
+server:
+  port: ${PORT:5001}
+  error:
+    include-message: always
+spring:
+  application:
+    name: hom8
+  docker:
+    compose:
+      lifecycle-management: start_only
+  webflux:
+    base-path: /api/v1/hom8
+  r2dbc:
+    url: ${R2DBC_DATASOURCE_URL:r2dbc:postgresql://postgres:postgres@localhost:5432/hom8}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:postgres}
+  flyway:
+    url: ${JDBC_DATASOURCE_URL:jdbc:postgresql://postgres:postgres@localhost:5432/hom8}
+    user: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:postgres}
+    baseline-on-migrate: true
+    enabled: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:rabbit}
+    password: ${RABBITMQ_PASSWORD:rabbit}
+    ssl:
+      enabled: ${RABBITMQ_SSL_ENABLED:false}
+
+#  jackson:
+#    serialization:
+#      fail-on-empty-beans: false
+#      write-dates-as-timestamps: false
+#    deserialization:
+#      fail-on-unknown-properties: false
+#      accept-single-value-as-array: true
+#    mapper:
+#      accept-case-insensitive-properties: true
+#    default-property-inclusion: non_null
+
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:0}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
+
+logging:
+  level:
+    org.springframework.r2dbc: info
+
+
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    path: /swagger
+  webjars:
+    prefix: /swagger
+
+jwt:
+  secret-key: ${JWT_SECRET:0471e7a05c369139ad7e5cceaad78dec35309e36e8c7c40efd1948901b1b69b6}
+  expiration: ${JWT_EXPIRATION_LENGTH:7200000}
+
+api:
+  version: ${API_VERSION:1.0.0}
+  name: ${spring.application.name}
+  email: ${APP_EMAIL:support@book-keeper.com}
+  url: ${APP_URL:https://www.book-keeper.com}
+
+otp:
+  max-failed-attempts: ${MAX_OTP_FAILED_ATTEMPT:2}
