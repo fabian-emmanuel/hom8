@@ -64,7 +64,7 @@ public record UserServiceImpl(
                     .flatMap(user -> validateOtpAndActivate(user, request));
             case HELPER -> getHelper(request.phoneNumber())
                     .flatMap(user -> validateOtpAndActivate(user, request));
-            case ADMIN -> null;
+            case SUPER_ADMIN, ADMIN -> null;
         };
     }
 

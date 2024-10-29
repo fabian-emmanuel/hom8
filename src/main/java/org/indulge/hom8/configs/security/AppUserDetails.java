@@ -2,6 +2,7 @@ package org.indulge.hom8.configs.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.indulge.hom8.exceptions.ResourceNotFoundException;
+import org.indulge.hom8.repositories.AdminUserRepository;
 import org.indulge.hom8.repositories.HelperRepository;
 import org.indulge.hom8.repositories.HomeOwnerRepository;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -14,27 +15,28 @@ import reactor.core.publisher.Mono;
 @Service
 public record AppUserDetails(
         HomeOwnerRepository homeOwnerRepository,
-        HelperRepository helperRepository
+        HelperRepository helperRepository,
+        AdminUserRepository adminUserRepository
 ) implements ReactiveUserDetailsService {
 
     @Override
     public Mono<UserDetails> findByUsername(String phoneNumber) {
-        return homeOwnerRepository.findByPhoneNumber(phoneNumber)
-                .map(u -> User.withUsername(u.getPhoneNumber())
-                        .password(u.getPin())
-                        .accountExpired(!u.isActive())
-                        .disabled(!u.isActive())
-                        .accountLocked(!u.isActive())
-                        .roles(u.getUserType().name())
-                        .build())
+        return adminUserRepository.findByPhoneNumber(phoneNumber)
+                .map(this::mapToUserDetails)
+                .switchIfEmpty(homeOwnerRepository.findByPhoneNumber(phoneNumber)
+                .map(this::mapToUserDetails)
                 .switchIfEmpty(helperRepository.findByPhoneNumber(phoneNumber)
-                        .map(u -> User.withUsername(u.getPhoneNumber())
-                                .password(u.getPin())
-                                .accountExpired(!u.isActive())
-                                .disabled(!u.isActive())
-                                .accountLocked(!u.isActive())
-                                .roles(u.getUserType().name())
-                                .build())
-                        .switchIfEmpty(Mono.error(new ResourceNotFoundException("username/password not found."))));
+                        .map(this::mapToUserDetails)
+                        .switchIfEmpty(Mono.error(new ResourceNotFoundException("username/password not found.")))));
+    }
+
+    private UserDetails mapToUserDetails(org.indulge.hom8.models.User user) {
+        return User.withUsername(user.getPhoneNumber())
+                .password(user.getPin())
+                .accountExpired(!user.isActive())
+                .disabled(!user.isActive())
+                .accountLocked(!user.isActive())
+                .roles(user.getUserType().name())
+                .build();
     }
 }

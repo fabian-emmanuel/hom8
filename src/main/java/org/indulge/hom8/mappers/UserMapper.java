@@ -4,6 +4,7 @@ import org.indulge.hom8.dtos.UserProfileDTO;
 import org.indulge.hom8.dtos.UserRequestDTO;
 import org.indulge.hom8.dtos.UserResponseDTO;
 import org.indulge.hom8.enums.UserType;
+import org.indulge.hom8.models.Administrator;
 import org.indulge.hom8.models.Helper;
 import org.indulge.hom8.models.HomeOwner;
 import org.indulge.hom8.models.User;
@@ -36,4 +37,5 @@ public interface UserMapper {
 
     UserProfileDTO userProfile(Helper helper);
     UserProfileDTO userProfile(HomeOwner homeOwner);
+    UserProfileDTO userProfile(Administrator administrator);
 }

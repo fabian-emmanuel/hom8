@@ -6,6 +6,7 @@ import org.indulge.hom8.dtos.UserProfileDTO;
 import org.indulge.hom8.exceptions.InvalidRequestException;
 import org.indulge.hom8.exceptions.UnAuthorizedException;
 import org.indulge.hom8.mappers.UserMapper;
+import org.indulge.hom8.repositories.AdminUserRepository;
 import org.indulge.hom8.repositories.HelperRepository;
 import org.indulge.hom8.repositories.HomeOwnerRepository;
 import org.indulge.hom8.services.AuthService;
@@ -21,11 +22,11 @@ import reactor.core.publisher.Mono;
 public record AuthServiceImpl(
         ReactiveAuthenticationManager authenticationManager,
         AuthTokenService authTokenService,
+        AdminUserRepository adminUserRepository,
         HomeOwnerRepository homeOwnerRepository,
         HelperRepository helperRepository,
         UserMapper userMapper
 ) implements AuthService {
-
 
     @Override
     public Mono<LoginResponse> login(LoginRequest loginRequest) {
@@ -39,12 +40,14 @@ public record AuthServiceImpl(
     @Override
     public Mono<UserProfileDTO> authUser() {
         return authTokenService.getAuthenticatedUserPhone()
-                .flatMap(phoneNumber -> homeOwnerRepository.findByPhoneNumber(phoneNumber)
+                .flatMap(phoneNumber -> adminUserRepository.findByPhoneNumber(phoneNumber)
+                        .map(userMapper::userProfile)
+                        .switchIfEmpty(homeOwnerRepository.findByPhoneNumber(phoneNumber)
                         .map(userMapper::userProfile)
                         .switchIfEmpty(helperRepository.findByPhoneNumber(phoneNumber)
                                 .map(userMapper::userProfile)
                         .switchIfEmpty(Mono.error(new UnAuthorizedException("Unauthorized User!")))
-                ));
+                )));
     }
 
 }

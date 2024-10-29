@@ -1,9 +1,6 @@
 package org.indulge.hom8;
 
-import org.indulge.hom8.properties.Api;
-import org.indulge.hom8.properties.JWT;
-import org.indulge.hom8.properties.OTP;
-import org.indulge.hom8.properties.Redis;
+import org.indulge.hom8.properties.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,7 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableR2dbcAuditing
 @EnableR2dbcRepositories
 @EnableTransactionManagement
-@EnableConfigurationProperties(value = {JWT.class, Api.class, Redis.class, OTP.class})
+@EnableConfigurationProperties(value = {JWT.class, Api.class, Redis.class, OTP.class, Admin.class})
 public class Hom8Application {
 
     public static void main(String[] args) {
